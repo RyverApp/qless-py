@@ -9,46 +9,21 @@ import redis
 import pkgutil
 import logging
 import logging.handlers
-import logstash_formatter
 import decorator
 import simplejson as json
 
 # Internal imports
 from .exceptions import QlessException
 
+
 # Our logger
 
 
 def _getLogger():
     ''' Set the global logger '''
-    global logstash_formatter
     _logger = logging.getLogger('qless')
     if not len(_logger.handlers):
-        formatter = logging.Formatter(
-            '%(asctime)s | PID %(process)d | [%(levelname)s] %(message)s')
-        # Log to File
-        log_filename = '/var/log/qless/qless.log'
-        filehandler = logging.handlers.WatchedFileHandler(log_filename)
-        filehandler.setFormatter(formatter)
-        filehandler.setLevel(logging.INFO)
-        _logger.addHandler(filehandler)
-
-        # logstash-readable file
-        logstash_filename = '/var/log/qless/qless.json'
-        stash_formatter = logstash_formatter.LogstashFormatterV1()
-        logstash_handler = logging.handlers.WatchedFileHandler(logstash_filename)
-        logstash_handler.setFormatter(stash_formatter)
-        logstash_handler.setLevel(logging.INFO)
-        _logger.addHandler(logstash_handler)
-
-        # Log rotation
-        # Log rotation adds the message into the log file redundantly (#BUG)
-        # rotatehandler = logging.handlers.RotatingFileHandler(log_filename, maxBytes=104857600, backupCount=10)
-        # logger.addHandler(rotatehandler)
-        # logstashrotatehandler = logging.handlers.RotatingFileHandler(logstash_filename, maxBytes=104857600, backupCount=10)
-        # logger.addHandler(logstashrotatehandler)
-
-        # Log to Console
+        formatter = logging.Formatter('%(asctime)s | PID %(process)d | [%(levelname)s] %(message)s')
         consolehandler = logging.StreamHandler()
         consolehandler.setFormatter(formatter)
         consolehandler.setLevel(logging.DEBUG)
@@ -74,6 +49,7 @@ def _reloadLogger():
 def retry(*excepts):
     '''A decorator to specify a bunch of exceptions that should be caught
     and the job retried. It turns out this comes up with relative frequency'''
+
     @decorator.decorator
     def new_func(func, job):
         '''No docstring'''
@@ -81,6 +57,7 @@ def retry(*excepts):
             func(job)
         except tuple(excepts):
             job.retry()
+
     return new_func
 
 
