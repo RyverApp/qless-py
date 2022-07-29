@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+qless-py = {path = "."}
+argparse = "==1.*"
+decorator = "==3.*"
+gevent = "==1.*"
+hiredis = "==0.*"
+logstash-formatter = "==0.*"
+psutil = "==0.*"
+redis = "==2.*"
+setproctitle = "==1.*"
+simplejson = "==3.*"
+
+[requires]
+python_version = "2.7"
+
+[dev-packages]
