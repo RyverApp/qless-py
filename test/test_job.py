@@ -19,14 +19,15 @@ class Foo(object):
 
 class TestJob(TestQless):
     '''Test the Job class'''
+
     def test_attributes(self):
         '''Has all the basic attributes we'd expect'''
         self.client.queues['foo'].put('Foo', {'whiz': 'bang'}, jid='jid',
-            tags=['foo'], retries=3)
+                                      tags=['foo'], retries=3)
         job = self.client.jobs['jid']
         atts = ['data', 'jid', 'priority', 'klass_name', 'queue_name', 'tags',
-            'expires_at', 'original_retries', 'retries_left', 'worker_name',
-            'dependents', 'dependencies']
+                'expires_at', 'original_retries', 'retries_left', 'worker_name',
+                'dependents', 'dependencies']
         values = [getattr(job, att) for att in atts]
         self.assertEqual(dict(zip(atts, values)), {
             'data': {'whiz': 'bang'},
@@ -202,10 +203,10 @@ class TestRecurring(TestQless):
     def test_attributes(self):
         '''We can access all the recurring attributes'''
         self.client.queues['foo'].recur('Foo', {'whiz': 'bang'}, 60, jid='jid',
-            tags=['foo'], retries=3)
+                                        tags=['foo'], retries=3)
         job = self.client.jobs['jid']
         atts = ['data', 'jid', 'priority', 'klass_name', 'queue_name', 'tags',
-            'retries', 'interval', 'count']
+                'retries', 'interval', 'count']
         values = [getattr(job, att) for att in atts]
         self.assertEqual(dict(zip(atts, values)), {
             'count': 0,

@@ -8,6 +8,7 @@ from . import Worker
 
 class SerialWorker(Worker):
     '''A worker that just does serial work'''
+
     def __init__(self, *args, **kwargs):
         Worker.__init__(self, *args, **kwargs)
         # The jid that we're working on at the moment

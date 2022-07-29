@@ -5,6 +5,7 @@ from common import TestQless
 
 class TestQueue(TestQless):
     '''Test the Job class'''
+
     def test_jobs(self):
         '''The queue.Jobs class provides access to job counts'''
         queue = self.client.queues['foo']

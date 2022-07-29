@@ -39,6 +39,7 @@ class PatchedGeventWorker(GeventWorker):
 
 class TestWorker(TestQless):
     '''Test the worker'''
+
     def setUp(self):
         TestQless.setUp(self)
         self.worker = PatchedGeventWorker(

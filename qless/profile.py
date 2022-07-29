@@ -18,7 +18,7 @@ class Profiler(object):
     def pretty(timings, label):
         '''Print timing stats'''
         results = [(sum(values), len(values), key)
-            for key, values in timings.items()]
+                   for key, values in timings.items()]
         print label
         print '=' * 65
         print '%20s => %13s | %8s | %13s' % (

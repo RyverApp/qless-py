@@ -13,6 +13,7 @@ from .serial import SerialWorker
 
 class ForkingWorker(Worker):
     '''A worker that forks child processes'''
+
     def __init__(self, *args, **kwargs):
         Worker.__init__(self, *args, **kwargs)
         # Worker class to use

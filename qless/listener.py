@@ -10,6 +10,7 @@ logger = logging.getLogger('qless')
 
 class Listener(object):
     '''A class that listens to pubsub channels and can unlisten'''
+
     def __init__(self, redis, channels):
         self._pubsub = redis.pubsub()
         self._channels = channels

@@ -25,6 +25,7 @@ class SerialJob(object):
 
 class Worker(SerialWorker):
     '''A worker that limits the number of jobs it runs'''
+
     def jobs(self):
         '''Yield only a few jobs'''
         generator = SerialWorker.jobs(self)
@@ -43,6 +44,7 @@ class Worker(SerialWorker):
 
 class NoListenWorker(Worker):
     '''A worker that just won't listen'''
+
     def listen(self, _):
         '''Don't listen for lost locks'''
         pass
@@ -50,6 +52,7 @@ class NoListenWorker(Worker):
 
 class TestWorker(TestQless):
     '''Test the worker'''
+
     def setUp(self):
         TestQless.setUp(self)
         self.queue = self.client.queues['foo']

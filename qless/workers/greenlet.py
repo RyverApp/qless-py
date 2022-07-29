@@ -10,6 +10,7 @@ from qless import logger
 
 class GeventWorker(Worker):
     '''A Gevent-based worker'''
+
     def __init__(self, *args, **kwargs):
         Worker.__init__(self, *args, **kwargs)
         # Should we shut down after this?

@@ -10,6 +10,7 @@ import simplejson as json
 
 class Jobs(object):
     '''A proxy object for queue-specific job information'''
+
     def __init__(self, name, client):
         self.name = name
         self.client = client
@@ -37,11 +38,12 @@ class Jobs(object):
 
 class Queue(object):
     '''The Queue class'''
+
     def __init__(self, name, client, worker_name):
-        self.name        = name
-        self.client      = client
+        self.name = name
+        self.client = client
         self.worker_name = worker_name
-        self._hb         = 60
+        self._hb = 60
 
     def __getattr__(self, key):
         if key == 'jobs':
@@ -68,7 +70,7 @@ class Queue(object):
         return klass.__module__ + '.' + klass.__name__
 
     def put(self, klass, data, priority=None, tags=None, delay=None,
-        retries=5, jid=None, depends=None, replace=1, resources=None, interval=None):
+            retries=5, jid=None, depends=None, replace=1, resources=None, interval=None):
         '''Either create a new job in the provided queue with the provided
         attributes, or move that job into that queue. If the job is being
         serviced by a worker, subsequent attempts by that worker to either
@@ -80,32 +82,32 @@ class Queue(object):
         the `valid after` argument should be in how many seconds the instance
         should be considered actionable.'''
         return self.client('put', self.worker_name, self.name,
-            jid or uuid.uuid4().hex,
-            self.class_string(klass),
-            json.dumps(data),
-            delay or 0,
-            'priority', priority or 0,
-            'tags', json.dumps(tags or []),
-            'retries', retries,
-            'depends', json.dumps(depends or []),
-            'replace', replace,
-            'resources', json.dumps(resources or []),
-            'interval', interval or 0.0
-        )
+                           jid or uuid.uuid4().hex,
+                           self.class_string(klass),
+                           json.dumps(data),
+                           delay or 0,
+                           'priority', priority or 0,
+                           'tags', json.dumps(tags or []),
+                           'retries', retries,
+                           'depends', json.dumps(depends or []),
+                           'replace', replace,
+                           'resources', json.dumps(resources or []),
+                           'interval', interval or 0.0
+                           )
 
     def recur(self, klass, data, interval, offset=0, priority=None, tags=None,
-        retries=None, resources=None, jid=None,):
+              retries=None, resources=None, jid=None,):
         '''Place a recurring job in this queue'''
         return self.client('recur', self.name,
-            jid or uuid.uuid4().hex,
-            self.class_string(klass),
-            json.dumps(data),
-            'interval', interval, offset,
-            'priority', priority or 0,
-            'tags', json.dumps(tags or []),
-            'retries', retries or 5,
-            'resources', json.dumps(resources or [])
-        )
+                           jid or uuid.uuid4().hex,
+                           self.class_string(klass),
+                           json.dumps(data),
+                           'interval', interval, offset,
+                           'priority', priority or 0,
+                           'tags', json.dumps(tags or []),
+                           'retries', retries or 5,
+                           'resources', json.dumps(resources or [])
+                           )
 
     def pop(self, count=None):
         '''Passing in the queue from which to pull items, the current time,

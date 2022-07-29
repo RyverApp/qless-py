@@ -1,5 +1,9 @@
 '''Main qless business'''
 
+from .job import Job, RecurringJob
+from .listener import Events
+from .config import Config
+from .queue import Queue
 import time
 import redis
 import pkgutil
@@ -13,21 +17,23 @@ import simplejson as json
 from .exceptions import QlessException
 
 # Our logger
+
+
 def _getLogger():
     ''' Set the global logger '''
     global logstash_formatter
-    _logger=logging.getLogger('qless')
+    _logger = logging.getLogger('qless')
     if not len(_logger.handlers):
         formatter = logging.Formatter(
-             '%(asctime)s | PID %(process)d | [%(levelname)s] %(message)s')
-        #Log to File
+            '%(asctime)s | PID %(process)d | [%(levelname)s] %(message)s')
+        # Log to File
         log_filename = '/var/log/qless/qless.log'
         filehandler = logging.handlers.WatchedFileHandler(log_filename)
         filehandler.setFormatter(formatter)
         filehandler.setLevel(logging.INFO)
         _logger.addHandler(filehandler)
 
-        #logstash-readable file
+        # logstash-readable file
         logstash_filename = '/var/log/qless/qless.json'
         stash_formatter = logstash_formatter.LogstashFormatterV1()
         logstash_handler = logging.handlers.WatchedFileHandler(logstash_filename)
@@ -35,14 +41,14 @@ def _getLogger():
         logstash_handler.setLevel(logging.INFO)
         _logger.addHandler(logstash_handler)
 
-        #Log rotation
+        # Log rotation
         # Log rotation adds the message into the log file redundantly (#BUG)
         # rotatehandler = logging.handlers.RotatingFileHandler(log_filename, maxBytes=104857600, backupCount=10)
         # logger.addHandler(rotatehandler)
         # logstashrotatehandler = logging.handlers.RotatingFileHandler(logstash_filename, maxBytes=104857600, backupCount=10)
         # logger.addHandler(logstashrotatehandler)
 
-        #Log to Console
+        # Log to Console
         consolehandler = logging.StreamHandler()
         consolehandler.setFormatter(formatter)
         consolehandler.setLevel(logging.DEBUG)
@@ -50,8 +56,10 @@ def _getLogger():
 
     return _logger
 
-#Set out GLOBAL logger
+
+# Set out GLOBAL logger
 logger = _getLogger()
+
 
 def _reloadLogger():
     global logger
@@ -78,6 +86,7 @@ def retry(*excepts):
 
 class Jobs(object):
     '''Class for accessing jobs and job information lazily'''
+
     def __init__(self, client):
         self.client = client
 
@@ -129,6 +138,7 @@ class Jobs(object):
 
 class Workers(object):
     '''Class for accessing worker information lazily'''
+
     def __init__(self, clnt):
         self.client = clnt
 
@@ -142,13 +152,14 @@ class Workers(object):
         '''Which jobs does a particular worker have running'''
         result = json.loads(
             self.client('workers', worker_name))
-        result['jobs']    = result['jobs'] or []
+        result['jobs'] = result['jobs'] or []
         result['stalled'] = result['stalled'] or []
         return result
 
 
 class Queues(object):
     '''Class for accessing queues lazily'''
+
     def __init__(self, clnt):
         self.client = clnt
 
@@ -166,6 +177,7 @@ class Queues(object):
 
 class Client(object):
     '''Basic qless client object.'''
+
     def __init__(self, url='redis://localhost:6379', hostname=None, **kwargs):
         import socket
         # This is our unique idenitifier as a worker
@@ -212,8 +224,3 @@ class Client(object):
     def unfail(self, group, queue, count=500):
         '''Move jobs from the failed group to the provided queue'''
         return self('unfail', queue, group, count)
-
-from .job import Job, RecurringJob
-from .queue import Queue
-from .config import Config
-from .listener import Events

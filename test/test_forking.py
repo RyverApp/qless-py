@@ -34,6 +34,7 @@ class CWD(object):
 
 class PatchedForkingWorker(ForkingWorker):
     '''A forking worker that doesn't register signal handlers'''
+
     def signals(self, signals=()):
         '''Do not actually register signal handlers'''
         pass
@@ -41,6 +42,7 @@ class PatchedForkingWorker(ForkingWorker):
 
 class TestWorker(TestQless):
     '''Test the worker'''
+
     def setUp(self):
         TestQless.setUp(self)
         self.worker = PatchedForkingWorker(

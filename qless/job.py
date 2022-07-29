@@ -33,7 +33,7 @@ class BaseJob(object):
     def __setattr__(self, key, value):
         if key == 'priority':
             return self.client('priority', self.jid, value
-                ) and object.__setattr__(self, key, value)
+                               ) and object.__setattr__(self, key, value)
         else:
             return object.__setattr__(self, key, value)
 
@@ -41,7 +41,7 @@ class BaseJob(object):
         if key == 'queue':
             # An actual queue instance
             object.__setattr__(self, 'queue',
-                self.client.queues[self.queue_name])
+                               self.client.queues[self.queue_name])
             return self.queue
         elif key == 'klass':
             # Get a reference to the provided klass
@@ -93,11 +93,12 @@ class BaseJob(object):
 
 class Job(BaseJob):
     '''The Job class'''
+
     def __init__(self, client, **kwargs):
         BaseJob.__init__(self, client, **kwargs)
         self.client = client
         for att in ['state', 'tracked', 'failure',
-            'history', 'dependents', 'dependencies']:
+                    'history', 'dependents', 'dependencies']:
             object.__setattr__(self, att, kwargs[att])
 
         # The reason we're using object.__setattr__ directly is because
@@ -133,12 +134,12 @@ class Job(BaseJob):
         your class.'''
         try:
             method = getattr(self.klass, self.queue_name,
-                getattr(self.klass, 'process', None))
+                             getattr(self.klass, 'process', None))
         except Exception as exc:
             # We failed to import the module containing this class
             logger.exception('Failed to import %s' % self.klass_name)
             return self.fail(self.queue_name + '-' + exc.__class__.__name__,
-                'Failed to import %s' % self.klass_name)
+                             'Failed to import %s' % self.klass_name)
 
         if method:
             if isinstance(method, types.FunctionType):
@@ -153,19 +154,19 @@ class Job(BaseJob):
                     logger.exception('Failed %s in %s: %s' % (
                         self.jid, self.queue_name, repr(method)))
                     self.fail(self.queue_name + '-' + exc.__class__.__name__,
-                        traceback.format_exc())
+                              traceback.format_exc())
             else:
                 # Or fail with a message to that effect
                 logger.error('Failed %s in %s : %s is not static' % (
                     self.jid, self.queue_name, repr(method)))
                 self.fail(self.queue_name + '-method-type',
-                    repr(method) + ' is not static')
+                          repr(method) + ' is not static')
         else:
             # Or fail with a message to that effect
             logger.error('Failed %s : %s is missing a method "%s" or "process"'
-                % (self.jid, self.klass_name, self.queue_name))
+                         % (self.jid, self.klass_name, self.queue_name))
             self.fail(self.queue_name + '-method-missing', self.klass_name +
-                ' is missing a method "' + self.queue_name + '" or "process"')
+                      ' is missing a method "' + self.queue_name + '" or "process"')
 
     def move(self, queue, delay=0, depends=None):
         '''Move this job out of its existing state and into another queue. If
@@ -175,8 +176,8 @@ class Job(BaseJob):
         logger.info('Moving %s to %s from %s' % (
             self.jid, queue, self.queue_name))
         return self.client('put', queue, self.jid, self.klass_name,
-            json.dumps(self.data), delay, 'depends', json.dumps(depends or [])
-        )
+                           json.dumps(self.data), delay, 'depends', json.dumps(depends or [])
+                           )
 
     def complete(self, nextq=None, delay=None, depends=None, result_data=None):
         '''Turn this job in as complete, optionally advancing it to another
@@ -186,15 +187,15 @@ class Job(BaseJob):
             logger.info('Advancing %s to %s from %s' % (
                 self.jid, nextq, self.queue_name))
             return self.client('complete', self.jid, self.client.worker_name,
-                self.queue_name, json.dumps(self.data), 'next', nextq,
-                'delay', delay or 0, 'depends', json.dumps(depends or []),
-                'result_data', json.dumps(result_data or {})
-            ) or False
+                               self.queue_name, json.dumps(self.data), 'next', nextq,
+                               'delay', delay or 0, 'depends', json.dumps(depends or []),
+                               'result_data', json.dumps(result_data or {})
+                               ) or False
         else:
             logger.info('Completing %s' % self.jid)
             return self.client('complete', self.jid, self.client.worker_name,
-                self.queue_name, json.dumps(self.data),
-                'result_data', json.dumps(result_data or {})) or False
+                               self.queue_name, json.dumps(self.data),
+                               'result_data', json.dumps(result_data or {})) or False
 
     def heartbeat(self):
         '''Renew the heartbeat, if possible, and optionally update the job's
@@ -202,7 +203,7 @@ class Job(BaseJob):
         logger.debug('Heartbeating %s (ttl = %s)' % (self.jid, self.ttl))
         try:
             self.expires_at = float(self.client('heartbeat', self.jid,
-            self.client.worker_name, json.dumps(self.data)) or 0)
+                                                self.client.worker_name, json.dumps(self.data)) or 0)
         except QlessException:
             print 'Raising exception'
             raise LostLockException(self.jid)
@@ -229,7 +230,7 @@ class Job(BaseJob):
         `False` on failure.'''
         logger.warn('Failing %s (%s): %s' % (self.jid, group, message))
         return self.client('fail', self.jid, self.client.worker_name, group,
-            message, json.dumps(self.data)) or False
+                           message, json.dumps(self.data)) or False
 
     def track(self):
         '''Begin tracking this job'''
@@ -243,7 +244,7 @@ class Job(BaseJob):
         '''Retry this job in a little bit, in the same queue. This is meant
         for the times when you detect a transient failure yourself'''
         return self.client('retry', self.jid, self.queue_name,
-            self.worker_name, delay)
+                           self.worker_name, delay)
 
     def depend(self, *args):
         '''If and only if a job already has other dependencies, this will add
@@ -267,10 +268,11 @@ class Job(BaseJob):
 
 class RecurringJob(BaseJob):
     '''Recurring Job object'''
+
     def __init__(self, client, **kwargs):
         BaseJob.__init__(self, client, **kwargs)
         for att in ['jid', 'priority', 'tags',
-            'retries', 'interval', 'count']:
+                    'retries', 'interval', 'count']:
             object.__setattr__(self, att, kwargs[att])
         object.__setattr__(self, 'client', client)
         object.__setattr__(self, 'klass_name', kwargs['klass'])
@@ -281,15 +283,15 @@ class RecurringJob(BaseJob):
     def __setattr__(self, key, value):
         if key in ('priority', 'retries', 'interval'):
             return self.client('recur.update', self.jid, key, value
-                ) and object.__setattr__(self, key, value)
+                               ) and object.__setattr__(self, key, value)
         if key == 'data':
             return self.client('recur.update', self.jid, key, json.dumps(value)
-                ) and object.__setattr__(self, 'data', value)
+                               ) and object.__setattr__(self, 'data', value)
         if key == 'klass':
             name = value.__module__ + '.' + value.__name__
             return self.client('recur.update', self.jid, 'klass', name
-                ) and object.__setattr__(self, 'klass_name', name
-                ) and object.__setattr__(self, 'klass', value)
+                               ) and object.__setattr__(self, 'klass_name', name
+                                                        ) and object.__setattr__(self, 'klass', value)
         return object.__setattr__(self, key, value)
 
     def __getattr__(self, key):

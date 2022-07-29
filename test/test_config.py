@@ -5,6 +5,7 @@ from common import TestQless
 
 class TestConfig(TestQless):
     '''Test the config class'''
+
     def test_set_get_unset(self):
         '''Basic set/get/unset'''
         self.assertEqual(self.client.config['foo'], None)

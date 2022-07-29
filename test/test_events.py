@@ -5,6 +5,7 @@ from common import TestQless
 
 class TestEvents(TestQless):
     '''Tests about events'''
+
     def setUp(self):
         TestQless.setUp(self)
         self.client.queues['foo'].put('Foo', {}, jid='jid')

@@ -199,8 +199,6 @@ class Worker(object):
             message = ''.join(traceback.format_stack(frame))
             message = 'Traceback:\n%s' % message
             code.InteractiveConsole(data).interact(message)
-        elif signum ==signal.SIGHUP:
+        elif signum == signal.SIGHUP:
             # HUP - reload logging configuration
             _reloadLogger()
-
-

@@ -13,6 +13,7 @@ import itertools
 
 class TestWorker(TestQless):
     '''Test the worker'''
+
     def setUp(self):
         TestQless.setUp(self)
         self.worker = Worker(['foo'], self.client)

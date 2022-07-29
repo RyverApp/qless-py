@@ -5,6 +5,7 @@ import simplejson as json
 
 class Config(object):
     '''A class that allows us to change and manipulate qless config'''
+
     def __init__(self, client):
         self._client = client
 

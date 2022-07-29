@@ -5,6 +5,7 @@ from common import TestQless
 
 class TestClient(TestQless):
     '''Test the client'''
+
     def test_track(self):
         '''Gives us access to track and untrack jobs'''
         self.client.queues['foo'].put('Foo', {}, jid='jid')
@@ -12,7 +13,7 @@ class TestClient(TestQless):
         self.assertEqual(self.client.jobs.tracked()['jobs'][0].jid, 'jid')
         self.client.untrack('jid')
         self.assertEqual(self.client.jobs.tracked(),
-            {'jobs': [], 'expired': {}})
+                         {'jobs': [], 'expired': {}})
 
     def test_attribute_error(self):
         '''Throws AttributeError for non-attributes'''
@@ -41,6 +42,7 @@ class TestClient(TestQless):
 
 class TestJobs(TestQless):
     '''Test the Jobs class'''
+
     def test_basic(self):
         '''Can give us access to jobs'''
         self.assertEqual(self.client.jobs['jid'], None)
@@ -63,7 +65,7 @@ class TestJobs(TestQless):
     def test_tracked(self):
         '''Gives us access to tracked jobs'''
         self.assertEqual(self.client.jobs.tracked(),
-            {'jobs': [], 'expired': {}})
+                         {'jobs': [], 'expired': {}})
         self.client.queues['foo'].put('Foo', {}, jid='jid')
         self.client.track('jid')
         self.assertEqual(self.client.jobs.tracked()['jobs'][0].jid, 'jid')
@@ -71,14 +73,14 @@ class TestJobs(TestQless):
     def test_tagged(self):
         '''Gives us access to tagged jobs'''
         self.assertEqual(self.client.jobs.tagged('foo'),
-            {'total': 0, 'jobs': {}})
+                         {'total': 0, 'jobs': {}})
         self.client.queues['foo'].put('Foo', {}, jid='jid', tags=['foo'])
         self.assertEqual(self.client.jobs.tagged('foo')['jobs'][0], 'jid')
 
     def test_failed(self):
         '''Gives us access to failed jobs'''
         self.assertEqual(self.client.jobs.failed('foo'),
-            {'total': 0, 'jobs': []})
+                         {'total': 0, 'jobs': []})
         self.client.queues['foo'].put('Foo', {}, jid='jid')
         self.client.queues['foo'].pop().fail('foo', 'bar')
         self.assertEqual(self.client.jobs.failed('foo')['jobs'][0].jid, 'jid')
@@ -93,6 +95,7 @@ class TestJobs(TestQless):
 
 class TestQueues(TestQless):
     '''Test the Queues class'''
+
     def test_basic(self):
         '''Gives us access to queues'''
         self.assertNotEqual(self.client.queues['foo'], None)
@@ -119,14 +122,15 @@ class TestQueues(TestQless):
 
 class TestWorkers(TestQless):
     '''Test the Workers class'''
+
     def test_individual(self):
         '''Gives us access to individual workers'''
         self.client.queues['foo'].put('Foo', {}, jid='jid')
         self.assertEqual(self.client.workers['worker'],
-            {'jobs': [], 'stalled': []})
+                         {'jobs': [], 'stalled': []})
         self.worker.queues['foo'].pop()
         self.assertEqual(self.client.workers['worker'],
-            {'jobs': ['jid'], 'stalled': []})
+                         {'jobs': ['jid'], 'stalled': []})
 
     def test_counts(self):
         '''Gives us access to worker counts'''
@@ -134,7 +138,7 @@ class TestWorkers(TestQless):
         self.assertEqual(self.client.workers.counts, {})
         self.worker.queues['foo'].pop()
         self.assertEqual(self.client.workers.counts,
-            [{'jobs': 1, 'name': 'worker', 'stalled': 0}])
+                         [{'jobs': 1, 'name': 'worker', 'stalled': 0}])
 
     def test_attribute_error(self):
         '''Raises AttributeErrors for non-attributes'''
@@ -159,6 +163,7 @@ class Foo(object):
 
 class TestRetry(TestQless):
     '''Test the retry decorator'''
+
     def test_basic(self):
         '''Ensure the retry decorator works'''
         # The first time, it should just be retries automatically
@@ -172,4 +177,4 @@ class TestRetry(TestQless):
     def test_docstring(self):
         '''Retry decorator should preserve docstring'''
         self.assertEqual(Foo.process.__doc__,
-            'This is supposed to raise an Exception')
+                         'This is supposed to raise an Exception')
