@@ -1,9 +1,5 @@
 '''Main qless business'''
 
-from .job import Job, RecurringJob
-from .listener import Events
-from .config import Config
-from .queue import Queue
 import time
 import redis
 import pkgutil
@@ -201,3 +197,8 @@ class Client(object):
     def unfail(self, group, queue, count=500):
         '''Move jobs from the failed group to the provided queue'''
         return self('unfail', queue, group, count)
+
+from .job import Job, RecurringJob
+from .queue import Queue
+from .config import Config
+from .listener import Events

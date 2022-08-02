@@ -1,10 +1,5 @@
 #! /usr/bin/env python
 
-from qless.workers.forking import ForkingWorker
-from qless import logger
-import qless
-import sys
-import os
 import psutil
 import argparse
 
@@ -44,6 +39,11 @@ parser.add_argument('-r', '--resume', default=False, action='store_true',
                     help='Try to resume jobs that this worker had previously been working on')
 args = parser.parse_args()
 
+import qless
+import sys
+import os
+from qless import logger
+from qless.workers.forking import ForkingWorker
 
 # Add each of the paths to the python search path
 sys.path = [os.path.abspath(p) for p in args.path] + sys.path

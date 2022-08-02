@@ -1,10 +1,5 @@
 #! /usr/bin/env python
 
-import threading
-import logging
-import random
-import qless
-import time
 import argparse
 
 # First off, read the arguments
@@ -31,6 +26,11 @@ parser.add_argument('--no-flush', dest='flush', default=True, action='store_fals
 
 args = parser.parse_args()
 
+import time
+import qless
+import random
+import logging
+import threading
 
 logger = logging.getLogger('qless-bench')
 formatter = logging.Formatter('[%(asctime)s] %(threadName)s => %(message)s')
