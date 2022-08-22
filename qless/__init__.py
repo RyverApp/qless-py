@@ -5,6 +5,7 @@ import redis
 import pkgutil
 import logging
 import logging.handlers
+import logstash_formatter
 import decorator
 import simplejson as json
 
@@ -17,9 +18,10 @@ from .exceptions import QlessException
 
 def _getLogger():
     ''' Set the global logger '''
+    global logstash_formatter
     _logger = logging.getLogger('qless')
     if not len(_logger.handlers):
-        formatter = logging.Formatter('%(asctime)s | PID %(process)d | [%(levelname)s] %(message)s')
+        formatter = logstash_formatter.LogstashFormatterV1()
         consolehandler = logging.StreamHandler()
         consolehandler.setFormatter(formatter)
         consolehandler.setLevel(logging.DEBUG)
