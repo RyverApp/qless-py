@@ -3,6 +3,7 @@
 import logging
 import threading
 import contextlib
+import redis
 
 # Our logger
 logger = logging.getLogger('qless')
@@ -22,6 +23,8 @@ class Listener(object):
             for message in self._pubsub.listen():
                 if message['type'] == 'message':
                     yield message
+        except redis.ConnectionError, ex:
+            logger.exception(ex)
         finally:
             self._channels = []
 
