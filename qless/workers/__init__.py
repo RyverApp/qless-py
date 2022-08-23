@@ -145,7 +145,6 @@ class Worker(object):
         '''Listen for pubsub messages relevant to this worker in a thread'''
         channels = ['ql:w:' + self.client.worker_name]
         listener = Listener(self.client.redis, channels)
-        print 'Self: %s' % self
         thread = threading.Thread(target=self.listen, args=(listener,))
         thread.start()
         try:
