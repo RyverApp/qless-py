@@ -159,6 +159,7 @@ class Client(object):
         self.worker_name = hostname or socket.gethostname()
         # This is just the redis instance we're connected to conceivably
         # someone might want to work with multiple instances simultaneously.
+        kwargs.setdefault('decode_responses', True)
         self.redis = redis.Redis.from_url(url, **kwargs)
         self.jobs = Jobs(self)
         self.queues = Queues(self)

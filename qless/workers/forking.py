@@ -19,7 +19,7 @@ class ForkingWorker(Worker):
         # Worker class to use
         self.klass = self.kwargs.pop('klass', SerialWorker)
         # How many children to launch
-        self.count = self.kwargs.pop('workers', 0) or psutil.NUM_CPUS
+        self.count = self.kwargs.pop('workers', 0) or psutil.cpu_count()
         # A dictionary of child pids to information about them
         self.sandboxes = {}
         # Whether or not we're supposed to shutdown
@@ -27,12 +27,12 @@ class ForkingWorker(Worker):
 
     def stop(self, sig=signal.SIGINT):
         '''Stop all the workers, and then wait for them'''
-        for cpid in self.sandboxes.keys():
+        for cpid in list(self.sandboxes.keys()):
             logger.warn('Stopping %i...' % cpid)
             os.kill(cpid, sig)
 
         # While we still have children running, wait for them
-        for cpid in self.sandboxes.keys():
+        for cpid in list(self.sandboxes.keys()):
             try:
                 logger.info('Waiting for %i...' % cpid)
                 pid, status = os.waitpid(cpid, 0)
@@ -49,7 +49,7 @@ class ForkingWorker(Worker):
         # Apparently there's an issue with importing gevent in the parent
         # process and then using it int he child. This is meant to relieve that
         # problem by allowing `klass` to be specified as a string.
-        if isinstance(self.klass, basestring):
+        if isinstance(self.klass, str):
             self.klass = util.import_class(self.klass)
         return self.klass(self.queues, self.client, **copy)
 
@@ -90,7 +90,7 @@ class ForkingWorker(Worker):
                             os.chdir(sandbox)
                             self.spawn(sandbox=sandbox).run()
                             exit(0)
-                except OSError, e:
+                except OSError as e:
                     if e.errno == errno.EINTR:
                         continue
                     else:
@@ -101,7 +101,7 @@ class ForkingWorker(Worker):
     def handler(self, signum, frame):  # pragma: no cover
         '''Signal handler for this process'''
         if signum in (signal.SIGTERM, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP):
-            for cpid in self.sandboxes.keys():
+            for cpid in list(self.sandboxes.keys()):
                 os.kill(cpid, signum)
             if signum == signal.SIGHUP:
                 # HUP - reload logging configuration

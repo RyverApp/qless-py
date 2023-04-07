@@ -4,19 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-qless-py = {path = "."}
-argparse = "==1.*"
-decorator = "==3.*"
-gevent = "==1.*"
-hiredis = "==0.*"
+qless-py = { path = ".", editable = true }
+decorator = "==5.*"
+gevent = "==26.*"
+greenlet = "==3.*"
+hiredis = "==2.*"
 logstash-formatter = "==0.*"
-psutil = "==0.*"
-redis = "==2.*"
+psutil = "==5.*"
+redis = "==4.*"
 setproctitle = "==1.*"
 simplejson = "==3.*"
 
 [dev-packages]
-nose = "==1.*"
+coverage = "==7.*"
 
 [requires]
-python_version = "2.7"
+python_version = "3"

@@ -4,13 +4,14 @@
 
 import os
 import time
-import types
+import inspect
 import traceback
 import simplejson as json
 
 # Internal imports
 from qless import logger
 from qless.exceptions import LostLockException, QlessException
+import importlib
 
 
 class BaseJob(object):
@@ -28,7 +29,7 @@ class BaseJob(object):
         # Because of how Lua parses JSON, empty tags comes through as {}
         object.__setattr__(self, 'tags', kwargs['tags'] or [])
         object.__setattr__(self, 'data', json.loads(kwargs['data']))
-        object.__setattr__(self, 'result_data', kwargs['result_data'] or {})
+        object.__setattr__(self, 'result_data', kwargs.get('result_data') or {})
 
     def __setattr__(self, key, value):
         if key == 'priority':
@@ -72,7 +73,7 @@ class BaseJob(object):
         if hasattr(mod, '__file__'):
             mtime = os.stat(mod.__file__).st_mtime
             if BaseJob._loaded[klass] < mtime:
-                mod = reload(mod)
+                mod = importlib.reload(mod)
 
         return getattr(mod, klass.rpartition('.')[2])
 
@@ -133,8 +134,9 @@ class Job(BaseJob):
         ``testing``, then this would invoke the ``testing`` staticmethod of
         your class.'''
         try:
-            method = getattr(self.klass, self.queue_name,
-                             getattr(self.klass, 'process', None))
+            name = (self.queue_name if hasattr(self.klass, self.queue_name)
+                   else 'process')
+            method = getattr(self.klass, name, None)
         except Exception as exc:
             # We failed to import the module containing this class
             logger.exception('Failed to import %s' % self.klass_name)
@@ -142,7 +144,7 @@ class Job(BaseJob):
                              'Failed to import %s' % self.klass_name)
 
         if method:
-            if isinstance(method, types.FunctionType):
+            if isinstance(inspect.getattr_static(self.klass, name, None), staticmethod):
                 try:
                     logger.info('Processing %s in %s' % (
                         self.jid, self.queue_name))
@@ -175,8 +177,9 @@ class Job(BaseJob):
         delay, and dependencies'''
         logger.info('Moving %s to %s from %s' % (
             self.jid, queue, self.queue_name))
-        return self.client('put', queue, self.jid, self.klass_name,
-                           json.dumps(self.data), delay, 'depends', json.dumps(depends or [])
+        return self.client('put', self.client.worker_name, queue, self.jid,
+                           self.klass_name, json.dumps(self.data), delay,
+                           'depends', json.dumps(depends or [])
                            )
 
     def complete(self, nextq=None, delay=None, depends=None, result_data=None):

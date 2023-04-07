@@ -28,10 +28,10 @@ class TestConfig(TestQless):
 
     def test_clear(self):
         '''Can unset all keys'''
-        original = dict(self.client.config.items())
-        for key in self.client.config.keys():
+        original = dict(list(self.client.config.items()))
+        for key in list(self.client.config.keys()):
             self.client.config[key] = 1
-        for value in self.client.config.values():
+        for value in list(self.client.config.values()):
             self.assertEqual(value, '1')
         self.client.config.clear()
         self.assertEqual(self.client.config.all, original)
@@ -53,7 +53,7 @@ class TestConfig(TestQless):
     def test_iter(self):
         '''We can iterate over the config'''
         self.assertEqual(
-            [key for key in self.client.config], self.client.config.keys())
+            [key for key in self.client.config], list(self.client.config.keys()))
 
     def test_get(self):
         '''We can use dictionary-style get'''

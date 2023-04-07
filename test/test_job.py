@@ -29,7 +29,7 @@ class TestJob(TestQless):
                 'expires_at', 'original_retries', 'retries_left', 'worker_name',
                 'dependents', 'dependencies']
         values = [getattr(job, att) for att in atts]
-        self.assertEqual(dict(zip(atts, values)), {
+        self.assertEqual(dict(list(zip(atts, values))), {
             'data': {'whiz': 'bang'},
             'dependencies': [],
             'dependents': [],
@@ -41,7 +41,7 @@ class TestJob(TestQless):
             'queue_name': 'foo',
             'retries_left': 3,
             'tags': ['foo'],
-            'worker_name': u''
+            'worker_name': ''
         })
 
     def test_set_priority(self):
@@ -181,7 +181,7 @@ class TestJob(TestQless):
         self.client.queues['foo'].pop().process()
         job = self.client.jobs['jid']
         self.assertEqual(job.state, 'failed')
-        self.assertEqual(job.failure['group'], 'foo-ImportError')
+        self.assertEqual(job.failure['group'], 'foo-ModuleNotFoundError')
 
     def test_nonstatic(self):
         '''Rasises an error if the relevant function's not static'''
@@ -208,7 +208,7 @@ class TestRecurring(TestQless):
         atts = ['data', 'jid', 'priority', 'klass_name', 'queue_name', 'tags',
                 'retries', 'interval', 'count']
         values = [getattr(job, att) for att in atts]
-        self.assertEqual(dict(zip(atts, values)), {
+        self.assertEqual(dict(list(zip(atts, values))), {
             'count': 0,
             'data': {'whiz': 'bang'},
             'interval': 60,

@@ -16,14 +16,24 @@ class Listener(object):
         self._pubsub = redis.pubsub()
         self._channels = channels
 
+    def subscribe(self):
+        '''Subscribe to our channels, blocking until Redis confirms each one'''
+        self._pubsub.subscribe(self._channels)
+        pending = set(self._channels)
+        while pending:
+            message = self._pubsub.get_message(timeout=None)
+            if message['type'] == 'subscribe':
+                pending.discard(message['channel'])
+
     def listen(self):
-        '''Listen for events as they come in'''
+        '''Listen for events as they come in, subscribing first if needed'''
         try:
-            self._pubsub.subscribe(self._channels)
+            if not self._pubsub.subscribed:
+                self.subscribe()
             for message in self._pubsub.listen():
                 if message['type'] == 'message':
                     yield message
-        except redis.ConnectionError, ex:
+        except redis.ConnectionError as ex:
             logger.exception(ex)
         finally:
             self._channels = []
@@ -35,6 +45,7 @@ class Listener(object):
     @contextlib.contextmanager
     def thread(self):
         '''Run in a thread'''
+        self.subscribe()
         thread = threading.Thread(target=self.listen)
         thread.start()
         try:

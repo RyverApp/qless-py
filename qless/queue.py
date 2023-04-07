@@ -65,7 +65,7 @@ class Queue(object):
 
     def class_string(self, klass):
         '''Return a string representative of the class'''
-        if isinstance(klass, basestring):
+        if isinstance(klass, str):
             return klass
         return klass.__module__ + '.' + klass.__name__
 

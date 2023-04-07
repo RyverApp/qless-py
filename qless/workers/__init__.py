@@ -50,10 +50,10 @@ class Worker(object):
     @classmethod
     def divide(cls, jobs, count):
         '''Divide up the provided jobs into count evenly-sized groups'''
-        jobs = list(zip(*itertools.izip_longest(*[iter(jobs)] * count)))
+        jobs = list(zip(*itertools.zip_longest(*[iter(jobs)] * count)))
         # If we had no jobs to resume, then we get an empty list
         jobs = jobs or [()] * count
-        for index in xrange(count):
+        for index in range(count):
             # Filter out the items in jobs that are Nones
             jobs[index] = [j for j in jobs[index] if j != None]
         return jobs
@@ -90,7 +90,7 @@ class Worker(object):
         # This should accept either queue objects, or string queue names
         self.queues = []
         for queue in queues:
-            if isinstance(queue, basestring):
+            if isinstance(queue, str):
                 self.queues.append(self.client.queues[queue])
             else:
                 self.queues.append(queue)
@@ -145,6 +145,7 @@ class Worker(object):
         '''Listen for pubsub messages relevant to this worker in a thread'''
         channels = ['ql:w:' + self.client.worker_name]
         listener = Listener(self.client.redis, channels)
+        listener.subscribe()
         thread = threading.Thread(target=self.listen, args=(listener,))
         thread.start()
         try:
@@ -186,7 +187,7 @@ class Worker(object):
             # USR1 - Print the backtrace
             message = ''.join(traceback.format_stack(frame))
             message = 'Signaled traceback for %s:\n%s' % (os.getpid(), message)
-            print message
+            print(message)
             logger.warn(message)
         elif signum == signal.SIGUSR2:
             # USR2 - Enter a debugger

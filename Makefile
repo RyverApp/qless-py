@@ -3,18 +3,18 @@
 
 .PHONY: deps
 deps: .venv
-	pipenv sync
+	pipenv sync --dev
 
 .PHONY: clean
 clean:
 	# Remove the build
-	sudo rm -rf build dist
+	rm -rf build dist
 	# And all of our pyc files
-	find . -name '*.pyc' | xargs -n 100 -r rm {}
+	find . -path ./.venv -prune -o -name '*.pyc' -print | xargs -n 100 -r rm
 	# And lastly, .coverage files
-	find . -name .coverage | xargs -r rm
+	find . -path ./.venv -prune -o -name .coverage -print | xargs -r rm
 
 .PHONY: test
 test:
 	rm -rf .coverage
-	pipenv run nosetests --exe --cover-package=qless --with-coverage --cover-branches -v
+	pipenv run coverage run --branch --source=qless -m unittest discover -s test -t test -v

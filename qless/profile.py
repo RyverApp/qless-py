@@ -18,15 +18,15 @@ class Profiler(object):
     def pretty(timings, label):
         '''Print timing stats'''
         results = [(sum(values), len(values), key)
-                   for key, values in timings.items()]
-        print label
-        print '=' * 65
-        print '%20s => %13s | %8s | %13s' % (
-            'Command', 'Average', '# Calls', 'Total time')
-        print '-' * 65
+                   for key, values in list(timings.items())]
+        print(label)
+        print('=' * 65)
+        print('%20s => %13s | %8s | %13s' % (
+            'Command', 'Average', '# Calls', 'Total time'))
+        print('-' * 65)
         for total, length, key in sorted(results, reverse=True):
-            print '%20s => %10.5f us | %8i | %10i us' % (
-                key, float(total) / length, length, total)
+            print('%20s => %10.5f us | %8i | %10i us' % (
+                key, float(total) / length, length, total))
 
     def __init__(self, client):
         self._client = self.clone(client)
@@ -43,7 +43,7 @@ class Profiler(object):
 
     def stop(self):
         '''Set everything back to normal and collect our data'''
-        for key, value in self._configs.items():
+        for key, value in list(self._configs.items()):
             self._client.config_set(key, value)
         logs = self._client.execute_command('slowlog', 'get', 100000)
         current = {
@@ -59,7 +59,7 @@ class Profiler(object):
                 if current['name']:
                     if current['name'] not in self._commands:
                         self._commands[current['name']] = defaultdict(list)
-                    for key, values in current['accumulated'].items():
+                    for key, values in list(current['accumulated'].items()):
                         self._commands[current['name']][key].extend(values)
                 current = {
                     'name': subcommand, 'accumulated': defaultdict(list)
@@ -72,16 +72,16 @@ class Profiler(object):
         if current['name']:
             if current['name'] not in self._commands:
                 self._commands[current['name']] = defaultdict(list)
-            for key, values in current['accumulated'].items():
+            for key, values in list(current['accumulated'].items()):
                 self._commands[current['name']][key].extend(values)
 
     def display(self):
         '''Print the results of this profiling'''
         self.pretty(self._timings, 'Raw Redis Commands')
-        print ''
-        for key, value in self._commands.items():
+        print('')
+        for key, value in list(self._commands.items()):
             self.pretty(value, 'Qless "%s" Command' % key)
-            print ''
+            print('')
 
     def __enter__(self):
         self.start()
@@ -91,4 +91,4 @@ class Profiler(object):
         self.stop()
         self.display()
         if typ:
-            raise typ, value, trace
+            raise value.with_traceback(trace)

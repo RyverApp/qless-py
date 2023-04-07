@@ -37,7 +37,7 @@ class Config(object):
 
     def clear(self):
         '''Remove all keys'''
-        for key in self.all.keys():
+        for key in list(self.all.keys()):
             self._client('config.unset', key)
 
     def get(self, option, default=None):
@@ -47,11 +47,11 @@ class Config(object):
 
     def items(self):
         '''Just like `dict.items`'''
-        return self.all.items()
+        return list(self.all.items())
 
     def keys(self):
         '''Just like `dict.keys`'''
-        return self.all.keys()
+        return list(self.all.keys())
 
     def pop(self, option, default=None):
         '''Just like `dict.pop`'''
@@ -63,9 +63,9 @@ class Config(object):
         '''Just like `dict.update`'''
         _kwargs = dict(kwargs)
         _kwargs.update(other)
-        for key, value in _kwargs.items():
+        for key, value in list(_kwargs.items()):
             self[key] = value
 
     def values(self):
         '''Just like `dict.values`'''
-        return self.all.values()
+        return list(self.all.values())
