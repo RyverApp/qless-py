@@ -9,7 +9,7 @@ setup(
     long_description='''
 Redis-based queue management, with heartbeating, job tracking,
 stats, notifications, and a whole lot more.''',
-    url='http://github.com/seomoz/qless-py',
+    url='https://github.com/seomoz/qless-py',
     author='Dan Lecocq',
     author_email='dan@seomoz.org',
     license="MIT License",

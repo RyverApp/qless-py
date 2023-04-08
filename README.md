@@ -87,7 +87,7 @@ into jobs. Jobs are described essentially by two pieces of information -- a
 class` and `data`. The class should have static methods that know how to
 process this type of job depending on the queue it's in. For those thrown for
 a loop by this example, it's in refrence to a
-[South Park](http://en.wikipedia.org/wiki/Gnomes_(South_Park\)) episode with a
+[South Park](https://en.wikipedia.org/wiki/Gnomes_(South_Park\)) episode with a
 group of enterprising gnomes set on world domination through three steps: 1)
 collect underpants, 2) ? 3) profit!
 
@@ -304,7 +304,7 @@ reimports it. We think of this as a feature.
 
 With this in mind, when I start a new project and want to make use of qless, I
 first start up the web app locally (see
-[`qless`](http://github.com/seomoz/qless) for more), take a first pass, and
+[`qless`](https://github.com/seomoz/qless) for more), take a first pass, and
 enqueue a single job while the worker is running:
 
 	# Supposing that I have /my/awesome/project/awesomeproject.py
@@ -564,7 +564,7 @@ Web App
 `Qless` also comes with a web app for administrative tasks, like keeping tabs
 on the progress of jobs, tracking specific jobs, retrying failed jobs, etc.
 It's available in the [`qless`](https://github.com/seomoz/qless) library as a
-mountable [`Sinatra`](http://www.sinatrarb.com/) app. The web app is language
+mountable [`Sinatra`](https://www.sinatrarb.com/) app. The web app is language
 agnostic and was one of the major desires out of this project, so you should
 consider using it even if you're not planning on using the Ruby client.
 
@@ -626,7 +626,7 @@ Redis Server Spec
 -----------------
 There was a feature request to be able to provide redis auth credentials, and
 rather than support any new attributes to the redis client that might come
-along, we'll now use a [redis url](http://redis-py.readthedocs.org/en/latest/#redis.StrictRedis.from_url).
+along, we'll now use a [redis url](https://redis-py.readthedocs.org/en/latest/#redis.StrictRedis.from_url).
 
 For example:
 

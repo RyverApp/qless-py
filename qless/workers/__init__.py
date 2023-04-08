@@ -190,7 +190,7 @@ class Worker(object):
             logger.warn(message)
         elif signum == signal.SIGUSR2:
             # USR2 - Enter a debugger
-            # Much thanks to http://stackoverflow.com/questions/132058
+            # Much thanks to https://stackoverflow.com/questions/132058
             data = {'_frame': frame}    # Allow access to frame object.
             data.update(frame.f_globals)  # Unless shadowed by global
             data.update(frame.f_locals)
