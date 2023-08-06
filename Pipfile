@@ -15,7 +15,8 @@ redis = "==2.*"
 setproctitle = "==1.*"
 simplejson = "==3.*"
 
+[dev-packages]
+nose = "==1.*"
+
 [requires]
 python_version = "2.7"
-
-[dev-packages]
