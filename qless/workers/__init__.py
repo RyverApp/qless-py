@@ -1,20 +1,18 @@
-#! /usr/bin/env python
+"""Our base worker"""
 
-'''Our base worker'''
-
-import os
 import code
-import signal
-import shutil
 import itertools
-import traceback
+import os
+import shutil
+import signal
 import threading
+import traceback
 from contextlib import contextmanager
-from qless import _reloadLogger
+
+from qless import _reloadLogger, exceptions, logger
 
 # Internal imports
 from qless.listener import Listener
-from qless import logger, exceptions
 
 # Try to use the fast json parser
 try:
@@ -24,8 +22,9 @@ except ImportError:  # pragma: no cover
 
 # Setting the process title
 try:
-    from setproctitle import setproctitle, getproctitle
+    from setproctitle import getproctitle, setproctitle
 except ImportError:  # pragma: no cover
+
     def setproctitle(title):
         pass
 
@@ -33,15 +32,16 @@ except ImportError:  # pragma: no cover
         return ''
 
 
-class Worker(object):
-    '''Worker. For doing work'''
+class Worker:
+    """Worker. For doing work"""
+
     @classmethod
     def title(cls, message=None, level='INFO'):
-        '''Set the title of the process'''
+        """Set the title of the process"""
         if message == None:
             return getproctitle()
         else:
-            setproctitle('qless-py-worker %s' % message)
+            setproctitle(f'qless-py-worker {message}')
             if level == 'DEBUG':
                 logger.debug(message)
             elif level == 'INFO':
@@ -49,7 +49,7 @@ class Worker(object):
 
     @classmethod
     def divide(cls, jobs, count):
-        '''Divide up the provided jobs into count evenly-sized groups'''
+        """Divide up the provided jobs into count evenly-sized groups"""
         jobs = list(zip(*itertools.zip_longest(*[iter(jobs)] * count)))
         # If we had no jobs to resume, then we get an empty list
         jobs = jobs or [()] * count
@@ -60,23 +60,23 @@ class Worker(object):
 
     @classmethod
     def clean(cls, path):
-        '''Clean up all the files in a provided path'''
+        """Clean up all the files in a provided path"""
         for pth in os.listdir(path):
             pth = os.path.abspath(os.path.join(path, pth))
             if os.path.isdir(pth):
-                logger.debug('Removing directory %s' % pth)
+                logger.debug(f'Removing directory {pth}')
                 shutil.rmtree(pth)
             else:
-                logger.debug('Removing file %s' % pth)
+                logger.debug(f'Removing file {pth}')
                 os.remove(pth)
 
     @classmethod
     @contextmanager
     def sandbox(cls, path):
-        '''Ensures path exists before yielding, cleans up after'''
+        """Ensures path exists before yielding, cleans up after"""
         # Ensure the path exists and is clean
         if not os.path.exists(path):
-            logger.debug('Making %s' % path)
+            logger.debug(f'Making {path}')
             os.makedirs(path)
         cls.clean(path)
         # Then yield, but make sure to clean up the directory afterwards
@@ -109,7 +109,7 @@ class Worker(object):
         self.shutdown = False
 
     def resumable(self):
-        '''Find all the jobs that we'd previously been working on'''
+        """Find all the jobs that we'd previously been working on"""
         # First, find the jids of all the jobs registered to this client.
         # Then, get the corresponding job objects
         jids = self.client.workers[self.client.worker_name]['jobs']
@@ -117,11 +117,11 @@ class Worker(object):
 
         # We'll filter out all the jobs that aren't in any of the queues
         # we're working on.
-        queue_names = set([queue.name for queue in self.queues])
+        queue_names = {queue.name for queue in self.queues}
         return [job for job in jobs if job.queue_name in queue_names]
 
     def jobs(self):
-        '''Generator for all the jobs'''
+        """Generator for all the jobs"""
         # If we should resume work, then we should hand those out first,
         # assuming we can still heartbeat them
         for job in self.resume:
@@ -129,7 +129,7 @@ class Worker(object):
                 if job.heartbeat():
                     yield job
             except exceptions.LostLockException:
-                logger.exception('Cannot resume %s' % job.jid)
+                logger.exception(f'Cannot resume {job.jid}')
         while True:
             seen = False
             for queue in self.queues:
@@ -142,7 +142,7 @@ class Worker(object):
 
     @contextmanager
     def listener(self):
-        '''Listen for pubsub messages relevant to this worker in a thread'''
+        """Listen for pubsub messages relevant to this worker in a thread"""
         channels = ['ql:w:' + self.client.worker_name]
         listener = Listener(self.client.redis, channels)
         listener.subscribe()
@@ -155,49 +155,49 @@ class Worker(object):
             thread.join()
 
     def listen(self, listener):
-        '''Listen for events that affect our ownership of a job'''
+        """Listen for events that affect our ownership of a job"""
         for message in listener.listen():
             try:
                 data = json.loads(message['data'])
                 if data['event'] in ('canceled', 'lock_lost', 'put'):
                     self.kill(data['jid'])
-            except:
+            except Exception:  # noqa: BLE001
                 logger.exception('Pubsub error')
 
     def kill(self, jid):
-        '''Stop processing the provided jid'''
+        """Stop processing the provided jid"""
         raise NotImplementedError('Derived classes must override "kill"')
 
     def signals(self, signals=('QUIT', 'USR1', 'USR2', 'HUP')):
-        '''Register our signal handler'''
+        """Register our signal handler"""
         for sig in signals:
             signal.signal(getattr(signal, 'SIG' + sig), self.handler)
 
     def stop(self):
-        '''Mark this for shutdown'''
+        """Mark this for shutdown"""
         self.shutdown = True
 
     # Unfortunately, for most of this, it's not really practical to unit test
     def handler(self, signum, frame):  # pragma: no cover
-        '''Signal handler for this process'''
+        """Signal handler for this process"""
         if signum == signal.SIGQUIT:
             # QUIT - Finish processing, but don't do any more work after that
             self.stop()
         elif signum == signal.SIGUSR1:
             # USR1 - Print the backtrace
             message = ''.join(traceback.format_stack(frame))
-            message = 'Signaled traceback for %s:\n%s' % (os.getpid(), message)
+            message = f'Signaled traceback for {os.getpid()}:\n{message}'
             print(message)
             logger.warn(message)
         elif signum == signal.SIGUSR2:
             # USR2 - Enter a debugger
             # Much thanks to https://stackoverflow.com/questions/132058
-            data = {'_frame': frame}    # Allow access to frame object.
+            data = {'_frame': frame}  # Allow access to frame object.
             data.update(frame.f_globals)  # Unless shadowed by global
             data.update(frame.f_locals)
             # Build up a message with a traceback
             message = ''.join(traceback.format_stack(frame))
-            message = 'Traceback:\n%s' % message
+            message = f'Traceback:\n{message}'
             code.InteractiveConsole(data).interact(message)
         elif signum == signal.SIGHUP:
             # HUP - reload logging configuration

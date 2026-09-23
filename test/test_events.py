@@ -1,10 +1,10 @@
-'''Tests about events'''
+"""Tests about events"""
 
 from common import TestQless
 
 
 class TestEvents(TestQless):
-    '''Tests about events'''
+    """Tests about events"""
 
     def setUp(self):
         TestQless.setUp(self)
@@ -12,9 +12,10 @@ class TestEvents(TestQless):
         self.client.jobs['jid'].track()
 
     def test_basic(self):
-        '''Ensure we can get a basic event'''
+        """Ensure we can get a basic event"""
+
         def func(_):
-            '''No docstring'''
+            """No docstring"""
             func.count += 1
 
         func.count = 0
@@ -24,13 +25,14 @@ class TestEvents(TestQless):
         self.assertEqual(func.count, 1)
 
     def test_off(self):
-        '''Ensure we can turn off callbacks'''
+        """Ensure we can turn off callbacks"""
+
         def popped(_):
-            '''No docstring'''
+            """No docstring"""
             popped.count += 1
 
         def completed(_):
-            '''No docstring'''
+            """No docstring"""
             completed.count += 1
 
         popped.count = 0
@@ -44,6 +46,5 @@ class TestEvents(TestQless):
         self.assertEqual(completed.count, 1)
 
     def test_not_implemented(self):
-        '''Ensure missing events throw errors'''
-        self.assertRaises(
-            NotImplementedError, self.client.events.on, 'foo', int)
+        """Ensure missing events throw errors"""
+        self.assertRaises(NotImplementedError, self.client.events.on, 'foo', int)

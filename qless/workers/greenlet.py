@@ -1,15 +1,17 @@
-'''A Gevent-based worker'''
+"""A Gevent-based worker"""
 
 import os
+
 import gevent
 import gevent.pool
 
-from . import Worker
 from qless import logger
+
+from . import Worker
 
 
 class GeventWorker(Worker):
-    '''A Gevent-based worker'''
+    """A Gevent-based worker"""
 
     def __init__(self, *args, **kwargs):
         Worker.__init__(self, *args, **kwargs)
@@ -20,13 +22,11 @@ class GeventWorker(Worker):
         count = kwargs.pop('greenlets', 10)
         self.pool = gevent.pool.Pool(count)
         # A list of the sandboxes that we'll use
-        self.sandbox = kwargs.pop(
-            'sandbox', os.path.join(os.getcwd(), 'qless-py-workers'))
-        self.sandboxes = [
-            os.path.join(self.sandbox, 'greenlet-%i' % i) for i in range(count)]
+        self.sandbox = kwargs.pop('sandbox', os.path.join(os.getcwd(), 'qless-py-workers'))
+        self.sandboxes = [os.path.join(self.sandbox, f'greenlet-{i}') for i in range(count)]
 
     def process(self, job):
-        '''Process a job'''
+        """Process a job"""
         sandbox = self.sandboxes.pop(0)
         try:
             with Worker.sandbox(sandbox):
@@ -38,20 +38,21 @@ class GeventWorker(Worker):
             self.sandboxes.append(sandbox)
 
     def kill(self, jid):
-        '''Stop the greenlet processing the provided jid'''
+        """Stop the greenlet processing the provided jid"""
         greenlet = self.greenlets.get(jid)
         if greenlet != None:
-            logger.warn('Lost ownership of %s' % jid)
+            logger.warn(f'Lost ownership of {jid}')
             greenlet.kill()
 
     @classmethod
     def patch(cls):  # pragma: no cover
-        '''Monkey-patch anything that needs to be patched'''
+        """Monkey-patch anything that needs to be patched"""
         from gevent import monkey
+
         monkey.patch_all()
 
     def run(self):
-        '''Work on jobs'''
+        """Work on jobs"""
         # Register signal handlers
         self.signals()
 
@@ -71,12 +72,12 @@ class GeventWorker(Worker):
                         # throwing exceptions. The hacky way to get around this
                         # is to force the import to happen before the greenlet
                         # is spawned.
-                        job.klass
+                        job.klass  # noqa: B018
                         greenlet = gevent.Greenlet(self.process, job)
                         self.greenlets[job.jid] = greenlet
                         self.pool.start(greenlet)
                     else:
-                        logger.debug('Sleeping for %fs' % self.interval)
+                        logger.debug(f'Sleeping for {self.interval:f}s')
                         gevent.sleep(self.interval)
             except StopIteration:
                 logger.info('Exhausted jobs')

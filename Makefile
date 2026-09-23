@@ -5,6 +5,15 @@
 deps: .venv
 	pipenv sync --dev
 
+.PHONY: format
+format:
+	ruff format .
+
+.PHONY: check
+check:
+	ruff format --check .
+	ruff check .
+
 .PHONY: clean
 clean:
 	# Remove the build

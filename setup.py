@@ -6,24 +6,20 @@ setup(
     name='qless-py',
     version='1.0.0',
     description='Redis-based Queue Management',
-    long_description='''
+    long_description="""
 Redis-based queue management, with heartbeating, job tracking,
-stats, notifications, and a whole lot more.''',
+stats, notifications, and a whole lot more.""",
     url='https://github.com/seomoz/qless-py',
     author='Dan Lecocq',
     author_email='dan@seomoz.org',
-    license="MIT License",
+    license='MIT License',
     keywords='redis, qless, job',
     packages=['qless', 'qless.workers'],
-    package_dir={
-        'qless': 'qless',
-        'qless.workers': 'qless/workers'},
+    package_dir={'qless': 'qless', 'qless.workers': 'qless/workers'},
     package_data={'qless': ['qless-core/*.lua']},
     include_package_data=True,
     scripts=['bin/qless-py-worker'],
-    extras_require={
-        'ps': ['setproctitle']
-    },
+    extras_require={'ps': ['setproctitle']},
     install_requires=[
         'decorator',
         'gevent',
@@ -37,6 +33,6 @@ stats, notifications, and a whole lot more.''',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Intended Audience :: Developers',
-        'Operating System :: OS Independent'
-    ]
+        'Operating System :: OS Independent',
+    ],
 )

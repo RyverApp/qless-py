@@ -94,27 +94,27 @@ collect underpants, 2) ? 3) profit!
 ```python
 # In gnomes.py
 class GnomesJob(object):
-	# This would be invoked when a GnomesJob is popped off the 'underpants' queue
-	@staticmethod
-	def underpants(job):
-		# 1) Collect Underpants
-		...
-		# Complete and advance to the next step, 'unknown'
-		job.complete('unknown')
-	
-	@staticmethod
-	def unknown(job):
-		# 2) ?
-		...
-		# Complete and advance to the next step, 'profit'
-		job.complete('profit')
-	
-	@staticmethod
-	def profit(job):
-		# 3) Profit
-		...
-		# Complete the job
-		job.complete()
+    # This would be invoked when a GnomesJob is popped off the 'underpants' queue
+    @staticmethod
+    def underpants(job):
+        # 1) Collect Underpants
+        ...
+        # Complete and advance to the next step, 'unknown'
+        job.complete('unknown')
+
+    @staticmethod
+    def unknown(job):
+        # 2) ?
+        ...
+        # Complete and advance to the next step, 'profit'
+        job.complete('profit')
+
+    @staticmethod
+    def profit(job):
+        # 3) Profit
+        ...
+        # Complete the job
+        job.complete()
 ```
 
 This makes it easy to describe how a `GnomesJob` might move through a pipeline,
@@ -126,20 +126,20 @@ meant as a convenience for pipelines:
 ```python
 # Alternative gnomes.py
 class GnomesJob(object):
-	# This method would be invoked at every stage
-	@staticmethod
-	def process(job):
-		if job['queue'] == 'underpants':
-			...
-			job.complete('underpants')
-		elif job['queue'] == 'unknown':
-			...
-			job.complete('profit')
-		elif job['queue'] == 'profit':
-			...
-			job.complete()
-		else:
-			job.fail('unknown-stage', 'What what?')
+    # This method would be invoked at every stage
+    @staticmethod
+    def process(job):
+        if job['queue'] == 'underpants':
+            ...
+            job.complete('underpants')
+        elif job['queue'] == 'unknown':
+            ...
+            job.complete('profit')
+        elif job['queue'] == 'profit':
+            ...
+            job.complete()
+        else:
+            job.fail('unknown-stage', 'What what?')
 ```
 
 Jobs have user data associated with them that can be modified as it goes
@@ -165,6 +165,7 @@ get run
 
 ```python
 import qless
+
 # Connecting to localhost on 6379
 client = qless.client()
 # Connecting to a remote machine
@@ -177,8 +178,9 @@ Now, reference a queue, and start putting your gnomes to work:
 queue = client.queues['underpants']
 
 import gnomes
+
 for i in range(1000):
-	queue.put(gnomes.GnomesJob, {})
+    queue.put(gnomes.GnomesJob, {})
 ```
 
 Alternatively, if the job class is not importable from where you're adding
@@ -187,7 +189,7 @@ jobs, you can use the full path of the job class as a string:
 ```python
 ...
 for i in range(1000):
-	queue.put('gnomes.GnomesJob', {})
+    queue.put('gnomes.GnomesJob', {})
 ```
 
 __By way of a quick note__, it's important that your job class can be imported
@@ -334,7 +336,7 @@ priority, the sooner it will be processed. If, for example, you get a new job
 to collect some really valuable underpants:
 
 ```python
-queue.put(qless.gnomes.GnomesJob, {'address': '123 Brief St.'}, priority = 10)
+queue.put(qless.gnomes.GnomesJob, {'address': '123 Brief St.'}, priority=10)
 ```
 
 You can also adjust a job's priority while it's waiting:
@@ -464,7 +466,7 @@ you need to buy eggs, and buy a pan before making an omelete, you could say:
 
 ```python
 eggs_jid = client.queues['buy_eggs'].put(myJob, {'count': 12})
-pan_jid  = client.queues['buy_pan' ].put(myJob, {'coating': 'non-stick'})
+pan_jid = client.queues['buy_pan'].put(myJob, {'coating': 'non-stick'})
 client.queues['omelete'].put(myJob, {'toppings': ['onions', 'ham']}, depends=[eggs_jid, pan_jid])
 ```
 

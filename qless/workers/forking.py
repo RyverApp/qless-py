@@ -1,18 +1,21 @@
-'''A worker that forks child processes'''
+"""A worker that forks child processes"""
 
-import os
-import psutil
-import signal
 import errno
+import os
+import signal
+import sys
+
+import psutil
+
+from qless import _reloadLogger, logger, util
 
 # Internal imports
 from . import Worker
-from qless import logger, util, _reloadLogger
 from .serial import SerialWorker
 
 
 class ForkingWorker(Worker):
-    '''A worker that forks child processes'''
+    """A worker that forks child processes"""
 
     def __init__(self, *args, **kwargs):
         Worker.__init__(self, *args, **kwargs)
@@ -26,24 +29,24 @@ class ForkingWorker(Worker):
         self.shutdown = False
 
     def stop(self, sig=signal.SIGINT):
-        '''Stop all the workers, and then wait for them'''
+        """Stop all the workers, and then wait for them"""
         for cpid in list(self.sandboxes.keys()):
-            logger.warn('Stopping %i...' % cpid)
+            logger.warn(f'Stopping {cpid}...')
             os.kill(cpid, sig)
 
         # While we still have children running, wait for them
         for cpid in list(self.sandboxes.keys()):
             try:
-                logger.info('Waiting for %i...' % cpid)
+                logger.info(f'Waiting for {cpid}...')
                 pid, status = os.waitpid(cpid, 0)
-                logger.warn('%i stopped with status %i' % (pid, status >> 8))
+                logger.warn(f'{pid} stopped with status {status >> 8}')
             except OSError:  # pragma: no cover
-                logger.exception('Error waiting for %i...' % cpid)
+                logger.exception(f'Error waiting for {cpid}...')
             finally:
                 self.sandboxes.pop(pid, None)
 
     def spawn(self, **kwargs):
-        '''Return a new worker for a child process'''
+        """Return a new worker for a child process"""
         copy = dict(self.kwargs)
         copy.update(kwargs)
         # Apparently there's an issue with importing gevent in the parent
@@ -54,42 +57,40 @@ class ForkingWorker(Worker):
         return self.klass(self.queues, self.client, **copy)
 
     def run(self):
-        '''Run this worker'''
+        """Run this worker"""
         self.signals(('TERM', 'INT', 'QUIT', 'HUP'))
         # Divide up the jobs that we have to divy up between the workers. This
         # produces evenly-sized groups of jobs
         resume = self.divide(self.resume, self.count)
         for index in range(self.count):
             # The sandbox for the child worker
-            sandbox = os.path.join(
-                os.getcwd(), 'qless-py-workers', 'sandbox-%s' % index)
+            sandbox = os.path.join(os.getcwd(), 'qless-py-workers', f'sandbox-{index}')
             cpid = os.fork()
             if cpid:
-                logger.info('Spawned worker %i' % cpid)
+                logger.info(f'Spawned worker {cpid}')
                 self.sandboxes[cpid] = sandbox
             else:  # pragma: no cover
                 # Move to the sandbox as the current working directory
                 with Worker.sandbox(sandbox):
                     os.chdir(sandbox)
                     self.spawn(resume=resume[index], sandbox=sandbox).run()
-                    exit(0)
+                    sys.exit(0)
 
         try:
             while not self.shutdown:
                 try:
                     pid, status = os.wait()
-                    logger.warn('Worker %i died with status %i from signal %i' % (
-                        pid, status >> 8, status & 0xff))
+                    logger.warn(f'Worker {pid} died with status {status >> 8} from signal {status & 0xFF}')
                     sandbox = self.sandboxes.pop(pid)
                     cpid = os.fork()
                     if cpid:
-                        logger.info('Spawned replacement worker %i' % cpid)
+                        logger.info(f'Spawned replacement worker {cpid}')
                         self.sandboxes[cpid] = sandbox
                     else:  # pragma: no cover
                         with Worker.sandbox(sandbox):
                             os.chdir(sandbox)
                             self.spawn(sandbox=sandbox).run()
-                            exit(0)
+                            sys.exit(0)
                 except OSError as e:
                     if e.errno == errno.EINTR:
                         continue
@@ -99,7 +100,7 @@ class ForkingWorker(Worker):
             self.stop(signal.SIGKILL)
 
     def handler(self, signum, frame):  # pragma: no cover
-        '''Signal handler for this process'''
+        """Signal handler for this process"""
         if signum in (signal.SIGTERM, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP):
             for cpid in list(self.sandboxes.keys()):
                 os.kill(cpid, signum)
@@ -107,4 +108,4 @@ class ForkingWorker(Worker):
                 # HUP - reload logging configuration
                 _reloadLogger()
             else:
-                exit(0)
+                sys.exit(0)

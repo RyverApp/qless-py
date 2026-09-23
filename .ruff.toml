@@ -1,0 +1,6 @@
+target-version = "py39"
+line-length = 120
+extend-include = ["bin/qless-py-worker"]
+
+[format]
+quote-style = "single"
