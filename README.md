@@ -3,7 +3,7 @@ qless [![CI](https://github.com/RyverApp/qless-py/actions/workflows/ci.yml/badge
 Qless is a powerful `Redis`-based job queueing system inspired by
 [resque](https://github.com/defunkt/resque#readme),
 but built on a collection of Lua scripts, maintained in the
-[qless-core](https://github.com/seomoz/qless-core) repo. Be sure to check the
+[qless-core](https://github.com/RyverApp/qless-core) repo. Be sure to check the
 changelog below.
 
 Philosophy and Nomenclature
@@ -41,7 +41,7 @@ Features
 	to be processed and how long they take to be processed. Currently, we keep
 	track of the count, mean, standard deviation, and a histogram of these
 	times.
-1. __Job data is stored temporarily__ -- Job info sticks around for a 
+1. __Job data is stored temporarily__ -- Job info sticks around for a
 	configurable amount of time so you can still look back on a job's history,
 	data, etc.
 1. __Priority__ -- Jobs with the same priority get popped in the order they
@@ -68,22 +68,18 @@ Install from pip:
 
 	pip install qless-py
 
-Alternatively, install qless-py from source by checking it out from GitHub,
-and checking out the qless-core submodule:
+Alternatively, install qless-py from source by checking it out from GitHub:
 
 ```bash
-git clone git://github.com/seomoz/qless-py.git
+git clone https://github.com/RyverApp/qless-py.git
 cd qless-py
-# qless-core is a submodule
-git submodule init
-git submodule update
-sudo python setup.py install
+sudo pip install .
 ```
 
 Business Time!
 ==============
 You've read this far -- you probably want to write some code now and turn them
-into jobs. Jobs are described essentially by two pieces of information -- a 
+into jobs. Jobs are described essentially by two pieces of information -- a
 class` and `data`. The class should have static methods that know how to
 process this type of job depending on the queue it's in. For those thrown for
 a loop by this example, it's in reference to a
@@ -93,7 +89,7 @@ collect underpants, 2) ? 3) profit!
 
 ```python
 # In gnomes.py
-class GnomesJob(object):
+class GnomesJob:
     # This would be invoked when a GnomesJob is popped off the 'underpants' queue
     @staticmethod
     def underpants(job):
@@ -125,7 +121,7 @@ meant as a convenience for pipelines:
 
 ```python
 # Alternative gnomes.py
-class GnomesJob(object):
+class GnomesJob:
     # This method would be invoked at every stage
     @staticmethod
     def process(job):
@@ -167,9 +163,9 @@ get run
 import qless
 
 # Connecting to localhost on 6379
-client = qless.client()
+client = qless.Client()
 # Connecting to a remote machine
-client = qless.client(host='foo.bar.com', port=1234)
+client = qless.Client(url='redis://foo.bar.com:1234')
 ```
 
 Now, reference a queue, and start putting your gnomes to work:
@@ -216,7 +212,7 @@ qless-py-worker --host foo.bar --port 1234 ...
 ```
 
 In the absence of the `--workers` argument, Qless will spawn as many workers
-as there are cores on the machine. The interval specifies how often to poll 
+as there are cores on the machine. The interval specifies how often to poll
 in seconds) for work items. Future versions may have a mechanism to support
 blocking pop.
 
@@ -312,11 +308,11 @@ enqueue a single job while the worker is running:
 	# Supposing that I have /my/awesome/project/awesomeproject.py
 	# In one terminal...
 	qless-py-worker --path /my/awesome/project --queue foo --workers 1 --interval 10 --verbose
-	
+
 	# In another terminal...
 	>>> import qless
 	>>> import awesomeproject
-	>>> qless.client().queues['foo'].put(awesomeproject.Job, {'key': 'value'))
+	>>> qless.Client().queues['foo'].put(awesomeproject.Job, {'key': 'value'})
 
 From there, I watch the output on the worker, adjust my job class, save it,
 watch again, etc., but __without restarting the worker__ -- in general it
@@ -417,7 +413,7 @@ configuration to change the behavior for heartbeating, and so forth. There
 aren't a tremendous number of configuration options, but an important one is
 how long job data is kept around. Job data is expired after it has been
 completed for `jobs-history` seconds, but is limited to the last
-`jobs-history-count` completed jobs. These default to 50k jobs, and 30 days,
+`jobs-history-count` completed jobs. These default to 50k jobs, and 7 days,
 but depending on volume, your needs may change. To only keep the last 500 jobs
 for up to 7 days:
 
@@ -518,7 +514,7 @@ jobs = queue.pop(20)
 
 Heartbeating
 ------------
-Each job object has a notion of when you must either check in with a heartbeat 
+Each job object has a notion of when you must either check in with a heartbeat
 or turn it in as completed. You can get the absolute time until it expires, or
 how long you have left:
 
@@ -544,10 +540,10 @@ job.complete('anotherQueue')
 
 Stats
 -----
-One of the selling points of Qless is that it keeps stats for you about your 
+One of the selling points of Qless is that it keeps stats for you about your
 underpants hijinks. It tracks the average wait time, number of jobs that have
 waited in a queue, failures, retries, and average running time. It also keeps
-histograms for the number of jobs that have waited _x_ time, and the number 
+histograms for the number of jobs that have waited _x_ time, and the number
 that took _x_ time to run.
 
 Frankly, these are best viewed using the web app.
@@ -556,7 +552,7 @@ Lua
 ---
 Qless is a set of client language bindings, but the majority of the work is
 done in a collection of Lua scripts that comprise the
-[core](https://github.com/seomoz/qless-core) functionality. These scripts run
+[core](https://github.com/RyverApp/qless-core) functionality. These scripts run
 on the Redis 2.6+ server atomically and allow for portability with the same
 functionality guarantees. Consult the documentation for `qless-core` to learn
 more about its internals.
@@ -652,12 +648,6 @@ With an existing copy of `qless-py` checked out
 git fetch
 git checkout v0.10.0
 
-# Checkout, update and build the submodule
-git submodule init
-git submodule update
-make -C qless/qless-core
-
-# Install dependencies and then qless
-sudo pip install -r requirements.txt
-sudo python setup.py install
+# Install qless
+sudo pip install .
 ```
