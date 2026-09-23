@@ -1,4 +1,4 @@
-qless [![Build Status](https://travis-ci.org/seomoz/qless-py.png)](https://travis-ci.org/seomoz/qless-py)
+qless [![CI](https://github.com/RyverApp/qless-py/actions/workflows/ci.yml/badge.svg)](https://github.com/RyverApp/qless-py/actions/workflows/ci.yml)
 =====
 Qless is a powerful `Redis`-based job queueing system inspired by
 [resque](https://github.com/defunkt/resque#readme),

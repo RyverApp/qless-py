@@ -13,7 +13,7 @@ from testcontainers.redis import RedisContainer
 
 REDIS_URL = os.environ.get('REDIS_URL')
 if not REDIS_URL:
-    _CONTAINER = RedisContainer('redis:7-alpine')
+    _CONTAINER = RedisContainer(os.environ.get('REDIS_IMAGE', 'redis:7-alpine'))
     _CONTAINER.start()
     atexit.register(_CONTAINER.stop)
     REDIS_URL = 'redis://%s:%s' % (
