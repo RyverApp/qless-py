@@ -161,6 +161,10 @@ class Worker:
                 data = json.loads(message['data'])
                 if data['event'] in ('canceled', 'lock_lost', 'put'):
                     self.kill(data['jid'])
+            except (SystemExit, KeyboardInterrupt) as exc:
+                # used by kill() to end the thread on lost job ownership
+                logger.debug(f'Listener stopping: {exc.__class__.__name__}')
+                return
             except Exception:  # noqa: BLE001
                 logger.exception('Pubsub error')
 
@@ -188,7 +192,7 @@ class Worker:
             message = ''.join(traceback.format_stack(frame))
             message = f'Signaled traceback for {os.getpid()}:\n{message}'
             print(message)
-            logger.warn(message)
+            logger.warning(message)
         elif signum == signal.SIGUSR2:
             # USR2 - Enter a debugger
             # Much thanks to https://stackoverflow.com/questions/132058

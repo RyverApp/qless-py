@@ -5,12 +5,21 @@ import os
 import signal
 import threading
 import time
+import warnings
 
 from common import TestQless
 
 # The stuff we're actually testing
 from qless.workers import Worker
 from qless.workers.forking import ForkingWorker
+
+
+def _run_in_background(worker):
+    """Runs the worker, suppressing its non-main-thread fork() warning, which
+    doesn't apply to the real single-threaded qless-py-worker entrypoint"""
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', message=r'.*fork\(\) may lead to deadlocks.*', category=DeprecationWarning)
+        worker.run()
 
 
 class Foo:
@@ -56,7 +65,7 @@ class TestWorker(TestQless):
 
     def test_respawn(self):
         """It respawns workers as needed"""
-        self.thread = threading.Thread(target=self.worker.run)
+        self.thread = threading.Thread(target=_run_in_background, args=(self.worker,))
         self.thread.start()
         time.sleep(0.1)
         self.worker.shutdown = True
@@ -66,7 +75,7 @@ class TestWorker(TestQless):
 
     def test_cwd(self):
         """Should set the child's cwd appropriately"""
-        self.thread = threading.Thread(target=self.worker.run)
+        self.thread = threading.Thread(target=_run_in_background, args=(self.worker,))
         self.thread.start()
         time.sleep(0.1)
         self.worker.shutdown = True

@@ -250,7 +250,7 @@ class Job(BaseJob):
         that job will fail. Failed jobs are kept until they are canceled or
         completed. __Returns__ the id of the failed job if successful, or
         `False` on failure."""
-        logger.warn(f'Failing {self.jid} ({group}): {message}')
+        logger.warning(f'Failing {self.jid} ({group}): {message}')
         return self.client('fail', self.jid, self.client.worker_name, group, message, json.dumps(self.data)) or False
 
     def track(self):

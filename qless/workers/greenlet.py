@@ -41,7 +41,7 @@ class GeventWorker(Worker):
         """Stop the greenlet processing the provided jid"""
         greenlet = self.greenlets.get(jid)
         if greenlet != None:
-            logger.warn(f'Lost ownership of {jid}')
+            logger.warning(f'Lost ownership of {jid}')
             greenlet.kill()
 
     @classmethod

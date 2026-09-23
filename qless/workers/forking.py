@@ -31,7 +31,7 @@ class ForkingWorker(Worker):
     def stop(self, sig=signal.SIGINT):
         """Stop all the workers, and then wait for them"""
         for cpid in list(self.sandboxes.keys()):
-            logger.warn(f'Stopping {cpid}...')
+            logger.warning(f'Stopping {cpid}...')
             os.kill(cpid, sig)
 
         # While we still have children running, wait for them
@@ -39,7 +39,7 @@ class ForkingWorker(Worker):
             try:
                 logger.info(f'Waiting for {cpid}...')
                 pid, status = os.waitpid(cpid, 0)
-                logger.warn(f'{pid} stopped with status {status >> 8}')
+                logger.warning(f'{pid} stopped with status {status >> 8}')
             except OSError:  # pragma: no cover
                 logger.exception(f'Error waiting for {cpid}...')
             finally:
@@ -80,7 +80,7 @@ class ForkingWorker(Worker):
             while not self.shutdown:
                 try:
                     pid, status = os.wait()
-                    logger.warn(f'Worker {pid} died with status {status >> 8} from signal {status & 0xFF}')
+                    logger.warning(f'Worker {pid} died with status {status >> 8} from signal {status & 0xFF}')
                     sandbox = self.sandboxes.pop(pid)
                     cpid = os.fork()
                     if cpid:
