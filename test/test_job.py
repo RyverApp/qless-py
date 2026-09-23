@@ -200,7 +200,7 @@ class TestJob(TestQless):
         self.assertEqual(job.failure['group'], 'foo-ModuleNotFoundError')
 
     def test_nonstatic(self):
-        """Rasises an error if the relevant function's not static"""
+        """Raises an error if the relevant function's not static"""
         self.client.queues['nonstatic'].put(Foo, {}, jid='jid')
         self.client.queues['nonstatic'].pop().process()
         job = self.client.jobs['jid']

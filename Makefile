@@ -13,6 +13,7 @@ format:
 check:
 	ruff format --check .
 	ruff check .
+	typos
 
 .PHONY: clean
 clean:

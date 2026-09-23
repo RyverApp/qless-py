@@ -86,7 +86,7 @@ You've read this far -- you probably want to write some code now and turn them
 into jobs. Jobs are described essentially by two pieces of information -- a 
 class` and `data`. The class should have static methods that know how to
 process this type of job depending on the queue it's in. For those thrown for
-a loop by this example, it's in refrence to a
+a loop by this example, it's in reference to a
 [South Park](https://en.wikipedia.org/wiki/Gnomes_(South_Park\)) episode with a
 group of enterprising gnomes set on world domination through three steps: 1)
 collect underpants, 2) ? 3) profit!
@@ -368,7 +368,7 @@ queue.put(qless.gnomes.GnomesJob, {}, delay=3600, priority=100)
 
 Recurring Jobs
 --------------
-Whether it's nightly maintainence, or weekly customer updates, you can have a
+Whether it's nightly maintenance, or weekly customer updates, you can have a
 job of a certain configuration set to recur. Recurring jobs still support
 priority, and tagging, and are attached to a queue. Let's say, for example, I
 need some global maintenance to run, and I don't care what machine runs it, so
@@ -477,7 +477,7 @@ Notifications
 -------------
 Tracked jobs emit events on specific pubsub channels as things happen to them.
 Whether it's getting popped off of a queue, completed by a worker, etc. The
-jist of it goes like this, though:
+gist of it goes like this, though:
 
 ```python
 def callback(evt, jid):
@@ -577,7 +577,7 @@ Things that have changed over time.
 v0.10.0
 -------
 The major change was the switch to `unified` qless. This change is
-semi-incompatibile. In particular, it changes the job history format but the new
+semi-incompatible. In particular, it changes the job history format but the new
 version knows how to convert the old format forward. Upgrades to your workers
 should be made from the end of pipelines towards the start. It will also be
 necessary to upgrade your `qless-web` install if you're using it.
@@ -589,7 +589,7 @@ necessary to upgrade your `qless-web` install if you're using it.
 - Redis URL interface. When specifying a qless client, the default is still to
 	point to `localhost:6379`, but rather than specify `host` and `port`, you
 	should provide a single `host` argument of a Redis URL format. For example,
-	`redis://user:auth@host:port/db`. Many of these paremeters are optional, but
+	`redis://user:auth@host:port/db`. Many of these parameters are optional, but
 	it seems to be the convention recently.
 
 Upgrading to qless-py 0.10.0

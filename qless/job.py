@@ -66,7 +66,7 @@ class BaseJob:
         for segment in klass.split('.')[1:-1]:
             mod = getattr(mod, segment)
 
-        # Alright, now check the file associated with it. Note that clases
+        # Alright, now check the file associated with it. Note that classes
         # defined in __main__ don't have a __file__ attribute
         if klass not in BaseJob._loaded:
             BaseJob._loaded[klass] = time.time()
@@ -103,7 +103,7 @@ class Job(BaseJob):
 
         # The reason we're using object.__setattr__ directly is because
         # we have __setattr__ defined for this class, and we're actually
-        # just interested in setting these memebers directly
+        # just interested in setting these members directly
         object.__setattr__(self, 'expires_at', kwargs['expires'])
         object.__setattr__(self, 'original_retries', kwargs['retries'])
         object.__setattr__(self, 'retries_left', kwargs['remaining'])

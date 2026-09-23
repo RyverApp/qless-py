@@ -59,7 +59,7 @@ class ForkingWorker(Worker):
     def run(self):
         """Run this worker"""
         self.signals(('TERM', 'INT', 'QUIT', 'HUP'))
-        # Divide up the jobs that we have to divy up between the workers. This
+        # Divide up the jobs that we have to divvy up between the workers. This
         # produces evenly-sized groups of jobs
         resume = self.divide(self.resume, self.count)
         for index in range(self.count):

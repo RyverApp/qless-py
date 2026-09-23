@@ -151,7 +151,7 @@ class Client:
     def __init__(self, url='redis://localhost:6379', hostname=None, **kwargs):
         import socket
 
-        # This is our unique idenitifier as a worker
+        # This is our unique identifier as a worker
         self.worker_name = hostname or socket.gethostname()
         # This is just the redis instance we're connected to conceivably
         # someone might want to work with multiple instances simultaneously.
