@@ -2,8 +2,6 @@
 
 import argparse
 
-import psutil
-
 # First off, read the arguments
 parser = argparse.ArgumentParser(description='Run qless workers.')
 
@@ -22,7 +20,7 @@ parser.add_argument('-d', '--workdir', default='.', help='The base work director
 parser.add_argument(
     '-w',
     '--workers',
-    default=psutil.NUM_CPUS,
+    default=0,
     type=int,
     help='How many processes to run. Set to 0 to use all available cores',
 )
