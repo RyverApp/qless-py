@@ -17,6 +17,7 @@ simplejson = "==3.*"
 
 [dev-packages]
 coverage = "==7.*"
+testcontainers = { version = "==4.*", extras = ["redis"] }
 
 [requires]
 python_version = "3"

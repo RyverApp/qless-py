@@ -1,7 +1,7 @@
 '''Test worker'''
 
 # Internal imports
-from common import TestQless
+from common import TestQless, REDIS_URL
 
 import qless
 from qless.workers import Worker
@@ -95,7 +95,7 @@ class TestWorker(TestQless):
         queue = self.worker.client.queues['foo']
         queue.put('foo', {})
         # Pop from another worker
-        other = qless.Client(hostname='other')
+        other = qless.Client(REDIS_URL, hostname='other')
         job = other.queues['foo'].pop()
         self.assertTrue(isinstance(job, qless.Job))
         # Now, we'll create a new worker and make sure it gets that job first
