@@ -50,7 +50,7 @@ class ForkingWorker(Worker):
         copy = dict(self.kwargs)
         copy.update(kwargs)
         # Apparently there's an issue with importing gevent in the parent
-        # process and then using it int he child. This is meant to relieve that
+        # process and then using it in the child. This is meant to relieve that
         # problem by allowing `klass` to be specified as a string.
         if isinstance(self.klass, str):
             self.klass = util.import_class(self.klass)

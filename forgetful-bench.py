@@ -77,7 +77,7 @@ class ForgetfulWorker(threading.Thread):
                     job.complete()
 
 
-# Make sure that the redis instance is empty first
+# Make sure that the Redis instance is empty first
 if len(client.redis.keys('*')):
     print('Must begin on an empty Redis instance')
     sys.exit(1)

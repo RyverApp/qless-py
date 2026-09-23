@@ -10,7 +10,7 @@ class Profiler:
 
     @staticmethod
     def clone(client):
-        """Clone the redis client to be slowlog-compatible"""
+        """Clone the Redis client to be slowlog-compatible"""
         kwargs = client.redis.connection_pool.connection_kwargs
         kwargs['parser_class'] = redis.connection.PythonParser
         pool = redis.connection.ConnectionPool(**kwargs)

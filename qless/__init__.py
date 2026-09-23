@@ -153,7 +153,7 @@ class Client:
 
         # This is our unique identifier as a worker
         self.worker_name = hostname or socket.gethostname()
-        # This is just the redis instance we're connected to conceivably
+        # This is just the Redis instance we're connected to conceivably
         # someone might want to work with multiple instances simultaneously.
         kwargs.setdefault('decode_responses', True)
         self.redis = redis.Redis.from_url(url, **kwargs)

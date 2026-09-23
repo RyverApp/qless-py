@@ -34,7 +34,7 @@ class Worker(SerialWorker):
             yield next(generator)
 
     def kill(self, jid):
-        """We'll push a message to redis instead of falling on our sword"""
+        """We'll push a message to Redis instead of falling on our sword"""
         self.client.redis.rpush('foo', jid)
         raise KeyboardInterrupt()
 
