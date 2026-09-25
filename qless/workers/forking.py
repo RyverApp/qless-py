@@ -7,7 +7,7 @@ import sys
 
 import psutil
 
-from qless import _reloadLogger, logger, util
+from qless import logger, util
 
 # Internal imports
 from . import Worker
@@ -104,8 +104,5 @@ class ForkingWorker(Worker):
         if signum in (signal.SIGTERM, signal.SIGINT, signal.SIGQUIT, signal.SIGHUP):
             for cpid in list(self.sandboxes.keys()):
                 os.kill(cpid, signum)
-            if signum == signal.SIGHUP:
-                # HUP - reload logging configuration
-                _reloadLogger()
-            else:
+            if signum != signal.SIGHUP:
                 sys.exit(0)

@@ -9,7 +9,7 @@ import threading
 import traceback
 from contextlib import contextmanager
 
-from qless import _reloadLogger, exceptions, logger
+from qless import exceptions, logger
 
 # Internal imports
 from qless.listener import Listener
@@ -203,6 +203,3 @@ class Worker:
             message = ''.join(traceback.format_stack(frame))
             message = f'Traceback:\n{message}'
             code.InteractiveConsole(data).interact(message)
-        elif signum == signal.SIGHUP:
-            # HUP - reload logging configuration
-            _reloadLogger()

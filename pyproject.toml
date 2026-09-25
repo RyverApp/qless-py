@@ -25,7 +25,6 @@ dependencies = [
     "decorator==5.*",
     "gevent==26.*",
     "hiredis==3.*",
-    "logstash-formatter==0.*",
     "psutil==7.*",
     "redis==8.*",
     "simplejson==4.*",

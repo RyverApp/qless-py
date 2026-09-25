@@ -58,10 +58,8 @@ def main():
 
     # Log to the provided file, if need be
     if args.logger:
-        import logstash_formatter
-
         handler = logging.FileHandler(args.logger)
-        handler.setFormatter(logstash_formatter.LogstashFormatterV1())
+        handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
         handler.setLevel(logging.DEBUG)
         logger.addHandler(handler)
 

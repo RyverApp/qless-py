@@ -1,46 +1,18 @@
 """Main qless business"""
 
 import logging
-import logging.handlers
 import pkgutil
 import time
 
 import decorator
-import logstash_formatter
 import redis
 import simplejson as json
 
 # Internal imports
 from .exceptions import QlessException
 
-# Our logger
-
-
-def _getLogger():
-    """Set the global logger"""
-    _logger = logging.getLogger('qless')
-    if not len(_logger.handlers):
-        formatter = logstash_formatter.LogstashFormatterV1()
-        consolehandler = logging.StreamHandler()
-        consolehandler.setFormatter(formatter)
-        consolehandler.setLevel(logging.DEBUG)
-        _logger.addHandler(consolehandler)
-
-    return _logger
-
-
-# Set out GLOBAL logger
-logger = _getLogger()
-
-
-def _reloadLogger():
-    global logger
-    logger.info('Reloading logger configuration...')
-    while len(logger.handlers) > 0:
-        h = logger.handlers[0]
-        logger.removeHandler(h)
-    logger = _getLogger()
-    logger.info('Reloaded logger configuration...')
+logger = logging.getLogger('qless')
+logger.addHandler(logging.NullHandler())
 
 
 def retry(*excepts):
