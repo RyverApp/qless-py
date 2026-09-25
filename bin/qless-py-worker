@@ -60,10 +60,10 @@ if args.verbose:
 if args.logger:
     import logging
 
-    from qless import formatter
+    import logstash_formatter
 
     handler = logging.FileHandler(args.logger)
-    handler.setFormatter(formatter)
+    handler.setFormatter(logstash_formatter.LogstashFormatterV1())
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
 
