@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qless-py"
+version = "1.0.0"
+description = "Redis-based Queue Management"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Dan Lecocq", email = "dan@seomoz.org" },
+]
+maintainers = [
+    { name = "Nathan Baulch", email = "nathan@ryver.com" },
+]
+keywords = ["redis", "qless", "job"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "decorator==5.*",
+    "gevent==26.*",
+    "hiredis==3.*",
+    "logstash-formatter==0.*",
+    "psutil==7.*",
+    "redis==8.*",
+    "simplejson==4.*",
+]
+
+[project.optional-dependencies]
+ps = ["setproctitle==1.*"]
+
+[project.urls]
+Homepage = "https://github.com/RyverApp/qless-py"
+
+[project.scripts]
+qless-py-worker = "qless.cli:main"
+
+[tool.setuptools]
+packages = ["qless", "qless.workers"]
+
+[tool.setuptools.package-data]
+qless = ["qless-core/*.lua"]
+
+[dependency-groups]
+dev = [
+    "coverage==7.*",
+    "testcontainers[redis]==4.*",
+]

@@ -1,9 +1,6 @@
-.venv:
-	mkdir $@
-
 .PHONY: deps
-deps: .venv
-	pipenv sync --dev
+deps:
+	uv sync --extra ps
 
 .PHONY: format
 format:
@@ -25,6 +22,6 @@ clean:
 	find . -path ./.venv -prune -o -name .coverage -print | xargs -r rm
 
 .PHONY: test
-test:
+test: deps
 	rm -rf .coverage
-	pipenv run coverage run --branch --source=qless -m unittest discover -s test -t test -v
+	uv run coverage run --branch --source=qless -m unittest discover -s test -t test -v
